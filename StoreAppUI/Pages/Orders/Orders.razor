@@ -18,7 +18,7 @@
                     <p class="card-text">@o.Product?.LongDescription</p>
                     <p class="card-text">Price: @o.Product?.Price</p>
                     <p class="card-text">Status: @getOrderStatus(o)</p>
-                    <a @onclick="(() => approveOrder(o))" class="btn btn-primary @getApproveOrderBtnClass()">Approve Order</a>
+                    <a @onclick="(() => approveOrder(o))" class="btn btn-primary @getApproveOrderBtnClass(o)">Approve Order</a>
                 </div>
             </div>
         </Virtualize>
@@ -51,7 +51,7 @@
             ordersByUser = loggedInUser == null ? 
                 ordersByUser : (await orderData.GetOrdersByUser(loggedInUser.UserId)).ToList();
         }
-        
+
         orders = ordersByUser;
     }
 
@@ -69,15 +69,16 @@
         return path;
     }
 
-    private Task approveOrder(OrderModel order)
+    private async Task approveOrder(OrderModel order)
     {
-        return orderData.ApproveOrder(order);
+        await orderData.ApproveOrder(order);
+        StateHasChanged();
     }
 
-    private string getApproveOrderBtnClass()
+    private string getApproveOrderBtnClass(OrderModel order)
     {
         string className;
-        if (isAdmin)
+        if (isAdmin && !order.IsApproved)
         {
             className = "order-approvebtn-visible";
         }
