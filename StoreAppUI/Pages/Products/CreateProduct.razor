@@ -1,0 +1,33 @@
+﻿@page "/CreateProduct"
+@inject IProductData productData
+@inject IWebHostEnvironment appEnvironment
+@inject IPictureFileManager fileManager
+@inject NavigationManager navManager
+
+<h3>Add Product</h3>
+
+<div class="product-create">
+    <EditForm Model="product" OnValidSubmit="createProd">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+    <div>
+        <label for="product-title">Product Title</label>
+         <InputText id="product-title" class="form-control" @bind-Value="product.ShortDescription" />
+
+        <label for="product-desc">Product Description</label>
+         <InputText id="product-desc" class="form-control" @bind-Value="product.LongDescription" />
+
+        <label for="product-price">Product Price</label>
+        <InputNumber id="product-price" class="form-control" @bind-Value="product.Price" />
+
+        <div class="mb-3">
+            <label for="formFile" class="form-label">Image</label>
+            <InputFile class="form-control" type="file" id="formFile" OnChange="((file) => memorizeFile(file.File))" />
+        </div>
+
+        <div>
+            <button class="btn btn-outline-primary" type="submit">Add product</button>
+        </div>
+    </div>
+    </EditForm>
+</div>

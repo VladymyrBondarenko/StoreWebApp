@@ -1,0 +1,21 @@
+﻿@*<AuthorizeView Policy="Admin">
+    <a href="/..">
+        Admin
+    </a>
+</AuthorizeView>*@
+
+<AuthorizeView>
+    <Authorized>
+         <a href="">
+            Profile
+        </a>
+        <a href="MicrosoftIdentity/Account/SignOut">
+            Logout
+        </a>
+    </Authorized>
+    <NotAuthorized>
+        <a href="MicrosoftIdentity/Account/SignIn">
+            Login
+        </a>
+    </NotAuthorized>
+</AuthorizeView>

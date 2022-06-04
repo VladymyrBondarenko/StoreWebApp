@@ -1,0 +1,26 @@
+﻿@inject IProductData productData
+@inject IUserData userData
+@inject IOrderData orderData
+@inject IWebHostEnvironment appEnvironment
+@inject IPictureFileManager fileManager
+@inject NavigationManager navManager
+@inject AuthenticationStateProvider authProvider
+
+@page "/OrderProduct/{Id}"
+
+<h3>Order Product</h3>
+
+<div class="product-edit">
+    @if(productModel is not null)
+    {
+        <EditForm Model="productModel">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+        <div>
+            <div>
+                <button @onclick="(() => createOrder(productModel))" class="btn btn-outline-primary" type="submit">Confirme Order</button>
+            </div>
+        </div>
+        </EditForm>
+    }
+</div>

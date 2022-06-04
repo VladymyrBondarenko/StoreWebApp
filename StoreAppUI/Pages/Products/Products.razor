@@ -1,0 +1,30 @@
+﻿@page "/products"
+@inject IProductData productData
+@inject IUserData userData
+@inject NavigationManager navManager
+@inject AuthenticationStateProvider authProvider
+
+<h3>Products</h3>
+
+<div>
+    <button class="btn btn-outline-primary @getAddProdBtnClass().Result" @onclick="openCreateProduct">Add Product</button>
+</div>
+
+<div class="product-cards">
+    @if(products is not null)
+    {
+        <Virtualize Items="@products" Context="p" OverscanCount="10">
+            <div class="card" style="width: 18rem;">
+                <img src="@getImagePath(p.ImagePath)" class="card-img-top" alt="...">
+                <div class="card-body">
+                    <h5 class="card-title">@p.ShortDescription</h5>
+                    <p class="card-text">@p.LongDescription</p>
+                    <p class="card-text">Price: @p.Price</p>
+                    <a @onclick="(() => openOrderProduct(p))" class="btn btn-primary">Buy</a>
+                    <a @onclick="(() => openEditProduct(p))" class="btn btn-success @getEditButtonClass().Result">Edit</a>
+                    <a @onclick="(() => deleteProduct(p))" class="btn btn-danger @getDeleteButtonClass().Result">Delete</a>
+                </div>
+            </div>
+        </Virtualize>
+    }
+</div>

@@ -1,0 +1,95 @@
+﻿@inject IUserData userData
+@inject IOrderData orderData
+@inject NavigationManager navManager
+@inject AuthenticationStateProvider authProvider
+
+@page "/orders"
+
+<h3>Orders</h3>
+
+<div class="product-cards">
+    @if(orders is not null)
+    {
+        <Virtualize Items="@orders" Context="o" OverscanCount="10">
+            <div class="card" style="width: 18rem;">
+                <img src="@getImagePath(o)" class="card-img-top" alt="...">
+                <div class="card-body">
+                    <h5 class="card-title">@o.Product?.ShortDescription</h5>
+                    <p class="card-text">@o.Product?.LongDescription</p>
+                    <p class="card-text">Price: @o.Product?.Price</p>
+                    <p class="card-text">Status: @getOrderStatus(o)</p>
+                    <a @onclick="(() => approveOrder(o))" class="btn btn-primary @getApproveOrderBtnClass()">Approve Order</a>
+                </div>
+            </div>
+        </Virtualize>
+    }
+</div>
+
+
+
+@code {
+
+    private List<OrderModel> orders;
+    private UserModel loggedInUser;
+    private bool isAdmin;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await authProvider.GetAuthenticationStateAsync();
+        var authUserClaims = authState.User.Claims;
+        isAdmin = authUserClaims.FirstOrDefault(c => c.Type.Contains("jobTitle"))?.Value == "admin";
+
+        loggedInUser = await authProvider.GetUserModelFromAuth(userData);
+
+        var ordersByUser = new List<OrderModel>();
+        if (isAdmin)
+        {
+            ordersByUser = (await orderData.GetAllOrders()).ToList();
+        }
+        else
+        {
+            ordersByUser = loggedInUser == null ? 
+                ordersByUser : (await orderData.GetOrdersByUser(loggedInUser.UserId)).ToList();
+        }
+        
+        orders = ordersByUser;
+    }
+
+    private string getImagePath(OrderModel order)
+    {
+        var path = string.Empty;
+
+        var prodImgPath = order.Product?.ImagePath;
+        if (!string.IsNullOrWhiteSpace(prodImgPath) && File.Exists(prodImgPath))
+        {
+            var fileName = Path.GetFileName(prodImgPath);
+            path = Path.Combine(Settings.ProductFileDir, fileName);
+        }
+
+        return path;
+    }
+
+    private Task approveOrder(OrderModel order)
+    {
+        return orderData.ApproveOrder(order);
+    }
+
+    private string getApproveOrderBtnClass()
+    {
+        string className;
+        if (isAdmin)
+        {
+            className = "order-approvebtn-visible";
+        }
+        else
+        {
+            className = "order-approvebtn-hidden";
+        }
+        return className;
+    }
+
+    private string getOrderStatus(OrderModel order)
+    {
+        return order.IsApproved ? "Done" : "Still Waiting";
+    }
+}
